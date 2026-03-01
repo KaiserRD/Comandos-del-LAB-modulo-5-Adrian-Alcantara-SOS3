@@ -1,0 +1,147 @@
+Comandos usados practica 1: Syncronizacion de carpetas con Rsync 
+maquina 1
+sudo dnf install rsync -y
+mkdir ~/sincro
+touch ~/sincro/archivo{1..100}.txt
+rsync -avz ~/sincro/ Adrian@10.0.0.115: /home/Adrian/sincro_destino/
+nano ~/sync_script.sh
+chmod +x ~/sync_script.sh
+crontab -e
+history
+
+maquina 2
+sudo dnf install rsync -y
+ip a
+ls ~/sincro_destino | wc -l
+ls ~/sincro_destino
+============================================
+
+Comandos usados practica 2: Instalacion y configuracion del Cluster
+maquina 1
+67  sudo dnf install pacemaker pcs resource-agents corosync -y
+68  sudo system ctl enable --now pcsd
+69  sudo systemctl enable --now pcsd
+70  sudo passwd hacluster
+71  sudo firewall-cmd --add-service=high-availability --permanent
+72  sudo firewall-cmd --reload
+73  ip a
+74  sudo pcs host auth 10.0.0.116 10.0.0.115
+75  sudo pcs host auth 10.0.0.116 10.0.0.115 -u hacluster
+76  sudo pcs cluster setup cluster_web 10.0.0.116 10.0.0.115
+77  sudo pcs cluster start --all
+78  sudo pcs cluster enable --all
+79  sudo pcs property set stonith=enable=false
+80  sudo pcs property set stonith-enable=false
+81  sudo pcs resource crete IP_flotante ocf:hearbeat:IPaddr2 ip=10.0.0.200 cidr_netmask=24 op monitor interval=30s
+82  sudo pcs status
+83  sudo pcs resource crete IP_flotante ocf:hearbeat:IPaddr2 ip=10.0.0.70 cidr_netmask=24 op monitor interval=30s
+84  ip a
+85  sudo pcs property set stonith-enabled=false
+86  sudo pcs resource crete IP_flotante ocf:hearbeat:IPaddr2 ip=10.0.0.70 cidr_netmask=24 op monitor interval=30s
+87  sudo pcs resource create IP_flotante ocf:hearbeat:IPaddr2 ip=10.0.0.70 cidr_netmask=24 op monitor interval=30s
+88  sudo pcs resource create IP_flotante ocf:hearbeat:IPaddr2 ip=10.0.0.80 cidr_netmask=24 op monitor interval=30s
+89  sudo pcs resource create IP_flotante ocf:heartbeat:IPaddr2 ip=10.0.0.80 cidr_netmask=24 op monitor interval=30s
+90  histoty
+91  history
+maquina 2 
+67  sudo dnf install pacemaker pcs resource-agents corosync -y
+68  sudo systemctl enable --now pcsd
+69  sudo passwd hacluster
+70  sudo firewall-cmd --add-service=availability --permanent
+71  sudo firewall-cmd --add-service=high-availability --permanent
+72  sudo firewall-cmd --reload
+73  ip a
+74  reboot
+75  history
+cmd
+ping 10.0.0.80 -t
+============================================
+
+Comandos usados practica 3:Cluster de Alta Disponibilidad HTTP
+nodo 1
+78  sudo dnf install keepalived -y
+79  sudo systemctl enable --now httpd
+80  sudo firewall-cmd --add-service=http --permanent
+81  sudo firewall-cmd --add-protocol=vrrp --permanent
+82  sudo firewall-cmd --reload
+83  echo "<h1>Este es el servidor 2(Respaldo)</h1>" | sudo tee /var/www/html/index.html
+84  sudo mv /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.backup
+85  sudo nano /etc/keepalived/keepalived.conf
+86  sudo systemctl enable --now keepalived
+87  sudo nano /etc/keepalived/keepalived.conf
+88  sudo pcs cluster stop --all
+89  sudo systemctl restart keepalived
+90  sudo nano /etc/keepalived/keepalived.conf
+91  sudo systemctl restart keepalived
+92  echo "<h1>Este es el servidor 2(Respaldo)</h1>" | sudo tee /var/www/html/index.html
+93  sudo systemctl restart keepalived
+94  curl http://localhost
+95  sudo rm -f /var/www/index.*
+96  echo "<h1>Este es el servidor 2(Respaldo)</h1>" | sudo tee /var/www/html/index.html
+97  echo "<h1>Este es el servidor 2(Respaldo)</h1>" | sudo tee /var/www/html/site1/index.html
+98  echo "<h1>Este es el servidor 2(Respaldo)</h1>" | sudo tee /var/www/html/site2/index.html
+99  ip a
+100 sudo nano /etc/keepalived/keepalived.conf
+101 sudo systemctl restart keepalived
+102 sduo systemctl enable --now httpd
+103 sudo systemctl enable --now httpd
+104 ip a
+105 sudo systemctl status keepalived
+106 sudo rm -f /etc/keepalived/keepalived.conf
+107 sudo nano /etc/keepalived/keepalived.conf
+108 sudo nano /etc/keepalived/keepalived.conf
+109 sudo systemctl restart keepalived
+110 ip a
+111 sudo systemctl restart keepalived
+112 sudo systemctl status keepalived
+nodo 2
+78  sudo dnf install keepalived -y
+79  sudo systemctl enable --now httpd
+80  sudo firewall-cmd --add-service=http --permanent
+81  sudo firewall-cmd --add-protocol=vrrp --permanent
+82  sudo firewall-cmd --reload
+83  echo "<h1>Este es el servidor 2(Respaldo)</h1>" | sudo tee /var/www/html/index.html
+84  sudo mv /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.backup
+85  sudo nano /etc/keepalived/keepalived.conf
+86  sudo systemctl enable --now keepalived
+87  sudo nano /etc/keepalived/keepalived.conf
+88  sudo pcs cluster stop --all
+89  sudo systemctl restart keepalived
+90  sudo nano /etc/keepalived/keepalived.conf
+91  sudo systemctl restart keepalived
+92  echo "<h1>Este es el servidor 2(Respaldo)</h1>" | sudo tee /var/www/html/index.html
+93  sudo systemctl restart keepalived
+94  curl http://localhost
+95  sudo rm -f /var/www/index.*
+96  echo "<h1>Este es el servidor 2(Respaldo)</h1>" | sudo tee /var/www/html/index.html
+97  echo "<h1>Este es el servidor 2(Respaldo)</h1>" | sudo tee /var/www/html/site1/index.html
+98  echo "<h1>Este es el servidor 2(Respaldo)</h1>" | sudo tee /var/www/html/site2/index.html
+99  ip a
+100 sudo nano /etc/keepalived/keepalived.conf
+101 sudo systemctl restart keepalived
+102 sduo systemctl enable --now httpd
+103 sudo systemctl enable --now httpd
+104 ip a
+105 sudo systemctl status keepalived
+106 sudo rm -f /etc/keepalived/keepalived.conf
+107 sudo nano /etc/keepalived/keepalived.conf
+108 sudo nano /etc/keepalived/keepalived.conf
+vrrp_instance VI_1 {
+    state BACKUP
+    interface ens160
+    virtual_router_id 51
+    priority 100
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1234
+    }
+    virtual_ipaddress {
+        10.0.0.30/24
+    }
+}
+109 sudo systemctl restart keepalived
+110 ip a
+111 sudo systemctl restart keepalived
+112 sudo systemctl status keepalived
+============================================
